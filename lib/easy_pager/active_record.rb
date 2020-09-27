@@ -4,8 +4,7 @@ require 'easy_pager/active_record/base'
 
 module EasyPager
   # EasyPager::ActiveRecord
-  module ActiveRecord
-  end
+  module ActiveRecord; end
 end
 
 ActiveSupport.on_load(:active_record) do

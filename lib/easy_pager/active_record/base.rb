@@ -6,55 +6,47 @@ module EasyPager
     module Base
       # @param [Integer] page_val
       # @return [ActiveRecord::Relation]
-      def page(page_val = 1)
-        page_val = page_val.to_i.positive? ? page_val.to_i : 1
-        scope = current_scope || relation
+      # @raise [ArgumentError]
+      def page(page_val)
+        raise ArgumentError unless page_val.to_i.positive?
+
         limit_val = EasyPager.options[:default_per]
-        offset_val = page_val - 1 >= 0 ? (page_val - 1) * limit_val : 0
-        scope.offset(offset_val).limit(limit_val)
+        (current_scope || relation).offset((page_val - 1) * limit_val).limit(limit_val)
       end
 
       # @param [Integer] limit_val
       # @return [ActiveRecord::Relation]
-      # @return [NilClass]
-      def per(limit_val = nil)
-        max_per = EasyPager.options[:max_per]
-        default_per = EasyPager.options[:default_per]
-        limit_val = limit_val.to_i >= 0 ? limit_val.to_i : default_per
-        limit_val = max_per if max_per && max_per.to_i > limit_val
-        scope = current_scope || relation
-        return unless scope.limit_value && scope.offset_value
+      # @raise [ArgumentError]
+      def per(limit_val)
+        raise ArgumentError unless limit_val.to_i.positive?
 
-        offset_val = (scope.offset_value / scope.limit_value) * limit_val
-        scope.offset(offset_val).limit(limit_val)
+        limit_val = [EasyPager.options[:max_per] || limit_val, limit_val].min
+        scope = current_scope || relation
+        scope = scope.page(1) unless scope.limit_value
+        scope.offset((scope.offset_value / scope.limit_value) * limit_val).limit(limit_val)
       end
 
-      # @return [Integer]
-      # @return [NilClass]
+      # @return [Integer, NilClass]
       def current_page
-        scope = current_scope || relation
-        return unless scope.limit_value && scope.offset_value
+        scope = current_scope
+        return unless !scope.nil? && scope.limit_value && scope.offset_value
 
         (scope.offset_value.to_i / scope.limit_value.to_i) + 1
       end
 
-      # @return [Integer]
-      # @return [NilClass]
+      # @return [Integer, NilClass]
       def total_pages
-        scope = current_scope || relation
-        return unless scope.limit_value && scope.offset_value
+        scope = current_scope
+        return unless !scope.nil? && scope.limit_value && scope.offset_value
 
         (BigDecimal(scope.total_count) / BigDecimal(scope.limit_value)).ceil
       end
 
-      # @return [Integer]
-      # @return [NilClass]
       # @todo cache total count
+      #
+      # @return [Integer]
       def total_count
-        scope = current_scope || relation
-        return unless scope.limit_value && scope.offset_value
-
-        scope.except(:limit, :offset).count
+        (current_scope || relation).except(:limit, :offset).count
       end
     end
   end

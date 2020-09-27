@@ -35,7 +35,7 @@ RSpec.describe EasyPager do
       end
       describe 'total_count' do
         subject { records.total_count }
-        it { is_expected.to eq nil }
+        it { is_expected.to eq 30 }
       end
       describe 'total_pages' do
         subject { records.total_pages }
@@ -48,31 +48,11 @@ RSpec.describe EasyPager do
     end
 
     context 'page is nil' do
+      subject { records }
+
       let(:page) { nil }
-      describe 'offset' do
-        subject { records.offset_value }
-        it { is_expected.to eq 0 }
-      end
-      describe 'limit' do
-        subject { records.limit_value }
-        it { is_expected.to eq 20 }
-      end
-      describe 'current_page' do
-        subject { records.current_page }
-        it { is_expected.to eq 1 }
-      end
-      describe 'total_count' do
-        subject { records.total_count }
-        it { is_expected.to eq 30 }
-      end
-      describe 'total_pages' do
-        subject { records.total_pages }
-        it { is_expected.to eq 2 }
-      end
-      describe 'count' do
-        subject { records.count }
-        it { is_expected.to eq 20 }
-      end
+
+      it { expect { subject }.to raise_error(ArgumentError) }
     end
 
     context 'page is 1' do
