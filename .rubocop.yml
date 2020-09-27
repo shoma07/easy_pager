@@ -1,16 +1,6 @@
 AllCops:
-  TargetRubyVersion: 2.6.5
-  Exclude:
-    - Gemfile.lock
-    - vendor/bundle/**/*
-    - vendor/bundler/**/*
-Metrics/AbcSize:
-  Max: 20
+  NewCops: enable
+  TargetRubyVersion: 2.7.1
 Metrics/BlockLength:
   Exclude:
     - spec/**/*
-Metrics/CyclomaticComplexity:
-  Max: 10
-Metrics/LineLength:
-  Max: 80
-  IgnoredPatterns: ['(\A|\s+)#']
